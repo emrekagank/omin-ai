@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechDrone Systems — Akıllı Satış AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #060810;
+    --surface:  #0d1117;
+    --card:     #111827;
+    --border:   rgba(255,255,255,0.07);
+    --accent:   #00e5a0;
+    --accent2:  #0099ff;
+    --text:     #e8eaf0;
+    --muted:    #6b7280;
+    --danger:   #ff4d6d;
+    --success:  #00e5a0;
+    --font-d:   'Syne', sans-serif;
+    --font-b:   'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-b);
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── IZGARA ARKA PLAN ── */
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── BULANIK KÜRELER ── */
+  .blob {
+    position: fixed; border-radius: 50%;
+    filter: blur(120px); pointer-events: none; z-index: 0;
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+  .blob-1 { width: 600px; height: 600px; background: rgba(0,229,160,0.07); top: -200px; left: -150px; }
+  .blob-2 { width: 500px; height: 500px; background: rgba(0,153,255,0.06); bottom: -100px; right: -100px; animation-delay: -9s; }
+  @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.05); } }
+
+  .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── MENÜ ── */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .logo { font-family: var(--font-d); font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  .nav-badge { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); background: rgba(0,229,160,0.1); border: 1px solid rgba(0,229,160,0.2); padding: 4px 10px; border-radius: 20px; }
+  .nav-links { display: flex; gap: 8px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: 6px; transition: color .2s, background .2s; }
+  .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  .nav-links a.active { color: var(--accent); }
+
+  /* ── KAHRAMAN ALANI ── */
+  .hero { padding: 80px 0 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .hero-label { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  .hero-label::before { content: ''; display: block; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse-dot 2s ease-in-out infinite; }
+  @keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 0 rgba(0,229,160,0.4); } 50% { box-shadow: 0 0 0 6px rgba(0,229,160,0); } }
+  h1 { font-family: var(--font-d); font-size: clamp(32px, 4vw, 52px); font-weight: 800; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 20px; }
+  h1 .line-accent { color: var(--accent); }
+  h1 .line-dim { color: var(--muted); }
+  .hero-sub { color: var(--muted); font-size: 16px; line-height: 1.7; margin-bottom: 32px; max-width: 440px; }
+
+  .hero-stats { display: flex; gap: 32px; }
+  .stat-num { font-family: var(--font-d); font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
+  .stat-num span { color: var(--accent); }
+  .stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; }
+
+  /* ── SOHBET KARTI ── */
+  .chat-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 0 60px rgba(0,229,160,0.04), 0 24px 48px rgba(0,0,0,0.4); animation: fadeUp .6s ease both .2s; }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: none; } }
+  .chat-header { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--border); background: rgba(0,229,160,0.03); }
+  .chat-avatar { width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .chat-title { font-family: var(--font-d); font-size: 13px; font-weight: 700; }
+  .chat-status { font-size: 11px; color: var(--accent); }
+  .chat-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; margin-left: auto; animation: pulse-dot 2s infinite; }
+
+  .chat-messages { height: 280px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .msg { max-width: 85%; display: flex; flex-direction: column; gap: 3px; }
+  .msg.bot { align-self: flex-start; }
+  .msg.user { align-self: flex-end; }
+  .msg-bubble { padding: 10px 14px; border-radius: 14px; font-size: 13.5px; line-height: 1.55; }
+  .msg.bot .msg-bubble { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+  .msg.user .msg-bubble { background: rgba(0,229,160,0.12); border: 1px solid rgba(0,229,160,0.2); color: var(--text); border-bottom-right-radius: 4px; }
+  .msg-time { font-size: 10px; color: var(--muted); padding: 0 4px; }
+  .msg.user .msg-time { text-align: right; }
+
+  .typing-indicator { display: none; align-self: flex-start; }
+  .typing-indicator.show { display: flex; }
+  .typing-bubble { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 14px; border-bottom-left-radius: 4px; padding: 12px 16px; display: flex; gap: 4px; align-items: center; }
+  .typing-bubble span { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; animation: bounce .9s ease-in-out infinite; }
+  .typing-bubble span:nth-child(2) { animation-delay: .15s; }
+  .typing-bubble span:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+  .chat-input-area { padding: 12px 14px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: flex-end; }
+  .chat-input { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 9px 13px; color: var(--text); font-family: var(--font-b); font-size: 13.5px; resize: none; outline: none; transition: border-color .2s; min-height: 40px; max-height: 100px; }
+  .chat-input:focus { border-color: rgba(0,229,160,0.3); }
+  .chat-input::placeholder { color: var(--muted); }
+  .btn-send { width: 40px; height: 40px; border-radius: 10px; border: none; cursor: pointer; background: linear-gradient(135deg, var(--accent), #00b87a); color: #000; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: transform .15s, opacity .15s; flex-shrink: 0; }
+  .btn-send:hover { transform: scale(1.05); }
+  .btn-send:active { transform: scale(0.97); }
+  .btn-send:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  /* ── ANA İÇERİK KARTLARI ── */
+  .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 0 0 60px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; animation: fadeUp .6s ease both; }
+  .card:nth-child(1) { animation-delay: .3s; }
+  .card:nth-child(2) { animation-delay: .45s; }
+  .card-title { font-family: var(--font-d); font-size: 16px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .card-title .icon { color: var(--accent); font-size: 18px; }
+  .card-sub { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
+
+  .form-group { margin-bottom: 14px; }
+  label { display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px; }
+  input[type=text], input[type=tel], textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 10px 13px; color: var(--text); font-family: var(--font-b); font-size: 14px; outline: none; transition: border-color .2s; }
+  input:focus, textarea:focus { border-color: rgba(0,229,160,0.35); }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  textarea { resize: none; min-height: 80px; }
+
+  .btn-primary { width: 100%; padding: 13px; border: none; border-radius: 10px; cursor: pointer; background: linear-gradient(135deg, var(--accent), #00b87a); color: #060810; font-family: var(--font-d); font-size: 14px; font-weight: 700; letter-spacing: 0.03em; transition: opacity .2s, transform .15s; }
+  .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  .status-msg { margin-top: 10px; padding: 10px 13px; border-radius: 8px; font-size: 13px; display: none; }
+  .status-msg.success { display: block; background: rgba(0,229,160,0.1); color: var(--accent); border: 1px solid rgba(0,229,160,0.2); }
+  .status-msg.error { display: block; background: rgba(255,77,109,0.1); color: var(--danger); border: 1px solid rgba(255,77,109,0.2); }
+
+  .feature-list { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
+  .feature-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+  .feat-icon { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0; background: rgba(0,229,160,0.1); border: 1px solid rgba(0,229,160,0.15); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .feat-title { color: var(--text); font-weight: 500; font-size: 13.5px; }
+
+  footer { border-top: 1px solid var(--border); padding: 20px 0; display: flex; justify-content: space-between; align-items: center; }
+  footer p { font-size: 12px; color: var(--muted); }
+  footer a { color: var(--accent); text-decoration: none; font-size: 12px; }
+
+  @media (max-width: 768px) { .hero { grid-template-columns: 1fr; gap: 40px; padding: 50px 0 40px; } .main-grid { grid-template-columns: 1fr; } .hero-stats { gap: 20px; } .nav-links { display: none; } }
+</style>
+</head>
+<body>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<div class="wrapper">
+  <nav>
+    <a href="/" class="logo">Tech<span>Drone</span> Systems</a>
+    <div class="nav-badge">Akıllı Satış AI</div>
+    <div class="nav-links">
+      <a href="/" class="active">Karşılama Sayfası</a>
+      <a href="/panel">Yönetim Paneli →</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-text">
+      <div class="hero-label">B2B Yapay Zekâ Asistanı</div>
+      <h1>
+        Otonom Drone<br>
+        <span class="line-accent">Sistemleri</span> için<br>
+        <span class="line-dim">Akıllı Satış.</span>
+      </h1>
+      <p class="hero-sub">
+        Savunma, lojistik ve tarım sektörlerine yönelik insansız hava araçları.
+        AI asistanımız sorularınızı anında yanıtlar, demo için ekibimizle buluşturur.
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">48<span>h</span></div>
+          <div class="stat-lbl">Demo yanıt süresi</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">3<span>+</span></div>
+          <div class="stat-lbl">Sektör çözümü</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">AI<span>↗</span></div>
+          <div class="stat-lbl">Destekli danışmanlık</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-card">
+      <div class="chat-header">
+        <div class="chat-avatar">🤖</div>
+        <div>
+          <div class="chat-title">TechDrone AI Asistan</div>
+          <div class="chat-status">Çevrimiçi · Türkçe destek</div>
+        </div>
+        <div class="chat-dot"></div>
+      </div>
+      
+      <div class="chat-messages" id="sohbetMesajlariKutusu">
+        <div class="msg bot">
+          <div class="msg-bubble">
+            Merhaba! TechDrone Systems satış asistanıyım. 🚁<br>
+            Drone sistemlerimiz, teknik özellikler veya demo hakkında
+            soru sorabilirsiniz.
+          </div>
+          <div class="msg-time">Şimdi</div>
+        </div>
+      </div>
+      
+      <div class="typing-indicator" id="yaziyorGostergesi">
+        <div class="typing-bubble">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+      
+      <div class="chat-input-area">
+        <textarea class="chat-input" id="kullaniciGirdisi"
+          placeholder="Soru sorun... (Enter = gönder)"
+          rows="1"></textarea>
+        <button class="btn-send" id="btnGonder" title="Gönder">➤</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="main-grid">
+    
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span> İletişim Bilgilerinizi Bırakın</div>
+      <div class="card-sub">Uzman ekibimiz 48 saat içinde sizi arayacak.</div>
+
+      <div class="form-group">
+        <label>Ad Soyad</label>
+        <input type="text" id="girdiIsim" placeholder="Ahmet Yılmaz">
+      </div>
+      <div class="form-group">
+        <label>Telefon</label>
+        <input type="tel" id="girdiTelefon" placeholder="+90 555 000 0000">
+      </div>
+      <div class="form-group">
+        <label>Not (isteğe bağlı)</label>
+        <textarea id="girdiNot" placeholder="Hangi sektör için değerlendiriyorsunuz?"></textarea>
+      </div>
+      <button class="btn-primary" id="btnKayitOl">Demo Talep Et →</button>
+      <div class="status-msg" id="formDurumMesaji"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">⚡</span> Neden TechDrone?</div>
+      <div class="card-sub">Sektörün en gelişmiş otonom sistemleri.</div>
+      <ul class="feature-list">
+        <li>
+          <div class="feat-icon">🛡️</div>
+          <div><div class="feat-title">Savunma & Gözetleme</div>Uzun menzilli, düşük imzalı insansız keşif platformları.</div>
+        </li>
+        <li>
+          <div class="feat-icon">📦</div>
+          <div><div class="feat-title">Lojistik & Kargo</div>Son kilometre teslimat ve depo otomasyon çözümleri.</div>
+        </li>
+        <li>
+          <div class="feat-icon">🌾</div>
+          <div><div class="feat-title">Tarım & Haritalama</div>Çok spektrumlu kamera ile hassas tarım analitiği.</div>
+        </li>
+        <li>
+          <div class="feat-icon">🤖</div>
+          <div><div class="feat-title">AI Entegrasyonu</div>Gerçek zamanlı nesne tespiti ve otonom karar alma.</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 TechDrone Systems — Akıllı Satış AI Demo</p>
+    <a href="/panel">Yönetim Paneli →</a>
+  </footer>
+</div>
+
+<script>
+  // API Sunucu Adresi (Aynı sunucudaysa boş bırakılır)
+  const API_URL = '';  
+  
+  // Yapay zekanın bağlamı hatırlaması için sohbet geçmişini tuttuğumuz dizi
+  let sohbetGecmisi = [];
+
+  function suAnkiSaat() {
+    return new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Kullanıcı veya bot mesajını alıp HTML olarak sohbet penceresine ekler.
+  function mesajiEkranaBas(kimden, metin) {
+    const kutu = document.getElementById('sohbetMesajlariKutusu');
+    const div = document.createElement('div');
+    div.className = `msg ${kimden === 'kullanici' ? 'user' : 'bot'}`;
+    div.innerHTML = `
+      <div class="msg-bubble">${metin.replace(/\n/g,'<br>')}</div>
+      <div class="msg-time">${suAnkiSaat()}</div>`;
+    kutu.appendChild(div);
+    kutu.scrollTop = kutu.scrollHeight; // Mesaj gelince en alta kaydır
+  }
+
+  // Bot düşünürken üç nokta animasyonunu açıp kapatır.
+  function yaziyorAnimasyonuAyarla(gosterilecekMi) {
+    document.getElementById('yaziyorGostergesi').classList.toggle('show', gosterilecekMi);
+    const kutu = document.getElementById('sohbetMesajlariKutusu');
+    kutu.scrollTop = kutu.scrollHeight;
+  }
+
+  // ── AI SOHBET MEKANİZMASI ────────────────────────────────────────────
+  async function mesajGonder() {
+    const girdi = document.getElementById('kullaniciGirdisi');
+    const buton = document.getElementById('btnGonder');
+    const metin = girdi.value.trim();
+    
+    if (!metin) return; // Boş mesaj atılmasını engelle
+
+    mesajiEkranaBas('kullanici', metin);
+    girdi.value = '';
+    girdi.style.height = 'auto'; // Textarea boyutunu sıfırla
+    buton.disabled = true; // Üst üste tıklamayı engelle
+    yaziyorAnimasyonuAyarla(true);
+
+    try {
+      // Arka plandaki (Python) /api/sohbet rotasına POST isteği atıyoruz
+      const yanit = await fetch(`${API_URL}/api/sohbet`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mesaj: metin, gecmis: sohbetGecmisi })
+      });
+      const veri = await yanit.json();
+
+      yaziyorAnimasyonuAyarla(false);
+
+      if (veri.basari) {
+        mesajiEkranaBas('bot', veri.cevap);
+        // Hafızaya ekle (Python'ın beklediği İngilizce role anahtarları mecburen korunur: user, assistant)
+        sohbetGecmisi.push({ role: 'user', content: metin });
+        sohbetGecmisi.push({ role: 'assistant', content: veri.cevap });
+        
+        // Token tasarrufu: Hafızada sadece son 10 mesajı tut
+        if (sohbetGecmisi.length > 10) sohbetGecmisi = sohbetGecmisi.slice(-10);
+      } else {
+        mesajiEkranaBas('bot', '⚠️ ' + (veri.hata || 'Bir hata oluştu.'));
+      }
+    } catch (hata) {
+      yaziyorAnimasyonuAyarla(false);
+      mesajiEkranaBas('bot', '⚠️ Sunucuya ulaşılamadı. Python çalışıyor mu?');
+    } finally {
+      buton.disabled = false;
+      girdi.focus();
+    }
+  }
+
+  // Butona basılınca veya Enter tuşlanınca gönder
+  document.getElementById('btnGonder').addEventListener('click', mesajGonder);
+  document.getElementById('kullaniciGirdisi').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); mesajGonder(); }
+  });
+
+  // Textarea'nın içeriğe göre otomatik büyümesi
+  document.getElementById('kullaniciGirdisi').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  });
+
+  // ── MÜŞTERİ ADAYI (LEAD) KAYIT MEKANİZMASI ─────────────────────────
+  document.getElementById('btnKayitOl').addEventListener('click', async () => {
+    const isim = document.getElementById('girdiIsim').value.trim();
+    const telefon = document.getElementById('girdiTelefon').value.trim();
+    const mesaj = document.getElementById('girdiNot').value.trim();
+    const durum = document.getElementById('formDurumMesaji');
+    const buton = document.getElementById('btnKayitOl');
+
+    durum.style.display = 'none';
+
+    if (!isim || !telefon) {
+      durum.textContent = '⚠️ Ad ve telefon zorunludur.';
+      durum.className = 'status-msg error';
+      durum.style.display = 'block';
+      return;
+    }
+
+    buton.disabled = true;
+    buton.textContent = 'Gönderiliyor...';
+
+    try {
+      // Python'daki /api/adaylar rotasına POST atıyoruz
+      const yanit = await fetch(`${API_URL}/api/adaylar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isim, telefon, mesaj })
+      });
+      const veri = await yanit.json();
+
+      if (veri.basari) {
+        durum.textContent = '✓ ' + veri.mesaj;
+        durum.className = 'status-msg success';
+        durum.style.display = 'block';
+        buton.textContent = 'Gönderildi ✓';
+        
+        // Kutuları boşalt
+        document.getElementById('girdiIsim').value = '';
+        document.getElementById('girdiTelefon').value = '';
+        document.getElementById('girdiNot').value = '';
+      } else {
+        throw new Error(veri.hata);
+      }
+    } catch (hata) {
+      durum.textContent = '❌ ' + (hata.message || 'Bağlantı hatası.');
+      durum.className = 'status-msg error';
+      durum.style.display = 'block';
+      buton.disabled = false;
+      buton.textContent = 'Demo Talep Et →';
+    }
+  });
+</script>
+</body>
+</html>
+

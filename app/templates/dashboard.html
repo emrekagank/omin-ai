@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akıllı Satış AI — Yönetim Paneli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #060810;
+    --surface: #0d1117;
+    --card:    #111827;
+    --border:  rgba(255,255,255,0.07);
+    --accent:  #00e5a0;
+    --accent2: #0099ff;
+    --text:    #e8eaf0;
+    --muted:   #6b7280;
+    --danger:  #ff4d6d;
+    --warning: #f59e0b;
+    --font-d:  'Syne', sans-serif;
+    --font-b:  'DM Sans', sans-serif;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--font-b); font-size: 14px; min-height: 100vh; }
+
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(0,153,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,153,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+
+  .layout { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+  /* ── YAN MENÜ (SIDEBAR) ── */
+  .sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 0; position: sticky; top: 0; height: 100vh; }
+  .sidebar-logo { font-family: var(--font-d); font-size: 16px; font-weight: 800; padding: 0 20px 24px; border-bottom: 1px solid var(--border); color: var(--text); text-decoration: none; display: block; }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-nav { padding: 16px 12px; flex: 1; }
+  .nav-section { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); padding: 0 8px; margin: 16px 0 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; color: var(--muted); text-decoration: none; cursor: pointer; transition: background .15s, color .15s; margin-bottom: 2px; }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-item.active { background: rgba(0,229,160,0.1); color: var(--accent); }
+  .nav-item .ni { font-size: 16px; }
+  .sidebar-bottom { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .sidebar-bottom a { font-size: 12px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+
+  /* ── ANA ALAN ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 28px; border-bottom: 1px solid var(--border); background: rgba(6,8,16,0.8); backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-d); font-size: 18px; font-weight: 700; }
+  .topbar-title span { color: var(--accent); }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+  .search-box { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; transition: border-color .2s; }
+  .search-box:focus-within { border-color: rgba(0,229,160,0.3); }
+  .search-box input { background: none; border: none; outline: none; color: var(--text); font-family: var(--font-b); font-size: 13px; width: 180px; }
+  .search-box input::placeholder { color: var(--muted); }
+  
+  .btn-refresh { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-family: var(--font-b); font-size: 13px; cursor: pointer; transition: border-color .2s, background .2s; }
+  .btn-refresh:hover { border-color: rgba(0,229,160,0.3); background: rgba(0,229,160,0.05); }
+  .btn-refresh:disabled { opacity: .5; cursor: not-allowed; }
+  .spin { animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .content { padding: 24px 28px; flex: 1; }
+
+  /* ── İSTATİSTİK KARTLARI (KPI) ── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; position: relative; overflow: hidden; animation: fadeUp .4s ease both; }
+  .kpi-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
+  .kpi-card:nth-child(2)::after { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .kpi-card:nth-child(3)::after { background: linear-gradient(90deg, var(--warning), transparent); }
+  .kpi-card:nth-child(4)::after { background: linear-gradient(90deg, #a78bfa, transparent); }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+  .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 10px; }
+  .kpi-value { font-family: var(--font-d); font-size: 32px; font-weight: 800; line-height: 1; color: var(--text); }
+  .kpi-change { font-size: 11px; color: var(--accent); margin-top: 6px; }
+
+  /* ── TABLO ALANI ── */
+  .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; animation: fadeUp .4s ease both .15s; }
+  .table-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .table-title { font-family: var(--font-d); font-size: 14px; font-weight: 700; }
+  .table-count { font-size: 11px; color: var(--muted); background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 20px; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th { text-align: left; padding: 10px 16px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); border-bottom: 1px solid var(--border); font-weight: 500; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; animation: rowIn .3s ease both; }
+  @keyframes rowIn { from { opacity:0; transform:translateX(-6px); } to { opacity:1; transform:none; } }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.025); }
+
+  td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
+  .td-id { color: var(--muted); font-size: 11px; font-family: monospace; }
+  .td-avatar { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, rgba(0,229,160,0.2), rgba(0,153,255,0.2)); border: 1px solid rgba(0,229,160,0.15); display: flex; align-items: center; justify-content: center; font-family: var(--font-d); font-size: 12px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+  .td-name-cell { display: flex; align-items: center; gap: 10px; }
+  .td-name { font-weight: 500; color: var(--text); }
+  .td-phone { color: var(--muted); font-size: 12px; margin-top: 1px; }
+  .td-message { color: var(--muted); font-size: 12px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .td-message.empty { font-style: italic; color: #374151; }
+  .td-date { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .badge-new { font-size: 10px; font-weight: 600; text-transform: uppercase; background: rgba(0,229,160,0.1); color: var(--accent); border: 1px solid rgba(0,229,160,0.2); padding: 2px 7px; border-radius: 20px; display: inline-block; }
+
+  .state-row td { padding: 48px; text-align: center; color: var(--muted); }
+  .state-icon { font-size: 32px; margin-bottom: 10px; }
+  .state-text { font-size: 14px; }
+
+  /* Alt Durum Çubuğu */
+  .status-bar { padding: 8px 28px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  #durumMetni.error { color: var(--danger); }
+  #durumMetni.ok { color: var(--accent); }
+
+  @media (max-width: 900px) { .sidebar { display: none; } .kpi-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .kpi-grid { grid-template-columns: 1fr; } .search-box { display: none; } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <a href="/" class="sidebar-logo">Tech<span>Drone</span></a>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Ana Menü</div>
+      <a href="/" class="nav-item"><span class="ni">🏠</span> Karşılama Sayfası</a>
+      <a href="/panel" class="nav-item active"><span class="ni">📊</span> Yönetim Paneli</a>
+      <div class="nav-section">Araçlar</div>
+      <div class="nav-item" onclick="adaylariYukle()"><span class="ni">🔄</span> Verileri Yenile</div>
+      <div class="nav-item" onclick="csvIndir()"><span class="ni">⬇️</span> CSV İndir</div>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="/saglik-durumu" target="_blank">🟢 API Durumu</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">Müşteri Adayı <span>Yönetim Paneli</span></div>
+      <div class="topbar-actions">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="aramaKutusu" placeholder="İsim veya telefon ara...">
+        </div>
+        <button class="btn-refresh" id="btnYenile" onclick="adaylariYukle()">
+          <span id="ikonYenile">↺</span> Yenile
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Toplam Lead</div>
+          <div class="kpi-value" id="kpiToplam">—</div>
+          <div class="kpi-change">Tüm zamanlar</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Bu Ay</div>
+          <div class="kpi-value" id="kpiBuAy">—</div>
+          <div class="kpi-change">Aylık kayıt</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Bugün</div>
+          <div class="kpi-value" id="kpiBugun">—</div>
+          <div class="kpi-change">Günlük yeni</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Dönüşüm Hedefi</div>
+          <div class="kpi-value" id="kpiHedef">%—</div>
+          <div class="kpi-change">Takip edilecek</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Müşteri Adayları (Leads)</div>
+          <span class="table-count" id="tabloSayaci">Yükleniyor...</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Müşteri</th>
+              <th>Mesaj</th>
+              <th>Tarih</th>
+              <th>Durum</th>
+            </tr>
+          </thead>
+          <tbody id="adaylarTabloGovdesi">
+            <tr class="state-row">
+              <td colspan="5">
+                <div class="state-icon">⏳</div>
+                <div class="state-text">Veriler yükleniyor...</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-dot"></div>
+      <span id="durumMetni">Hazır</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_URL = '';  // Boş = aynı sunucu
+  let sistemdekiAdaylar = [];
+
+  // ── YARDIMCI FONKSİYONLAR ──────────────────────────────────────────────────
+  function durumMesajiAyarla(mesaj, tur = '') {
+    const eleman = document.getElementById('durumMetni');
+    eleman.textContent = mesaj;
+    eleman.className = tur;
+  }
+
+  function tarihFormatla(str) {
+    if (!str) return '—';
+    try {
+      return new Date(str).toLocaleString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    } catch { return str; }
+  }
+
+  function basHarfler(isim) {
+    return (isim || '?').split(' ').slice(0,2).map(w => w[0]?.toUpperCase() || '').join('');
+  }
+
+  function htmlTemizle(metin) {
+    return (metin || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function bosDurumCiz(ikon, metin) {
+    document.getElementById('adaylarTabloGovdesi').innerHTML = `
+      <tr class="state-row"><td colspan="5"><div class="state-icon">${ikon}</div><div class="state-text">${metin}</div></td></tr>`;
+    document.getElementById('tabloSayaci').textContent = '0 kayıt';
+  }
+
+  // ── VERİLERİ YÜKLE (FETCH) ─────────────────────────────────────────────────
+  async function adaylariYukle() {
+    const buton  = document.getElementById('btnYenile');
+    const ikon = document.getElementById('ikonYenile');
+
+    buton.disabled = true;
+    ikon.className = 'spin';
+    durumMesajiAyarla('Veriler çekiliyor...');
+
+    try {
+      // Python API'sinden güncel aday listesini GET yapıyoruz
+      const yanit  = await fetch(`${API_URL}/api/adaylar`);
+      const veri = await yanit.json();
+
+      if (!veri.basari) throw new Error(veri.hata);
+
+      sistemdekiAdaylar = veri.adaylar;
+      kpiKartlariniGuncelle(sistemdekiAdaylar);
+      tabloyuCiz(sistemdekiAdaylar);
+      durumMesajiAyarla(`${veri.toplam} kayıt yüklendi — ${new Date().toLocaleTimeString('tr-TR')}`, 'ok');
+
+    } catch (hata) {
+      durumMesajiAyarla('Hata: ' + hata.message + ' — Python sunucusu çalışıyor mu?', 'error');
+      bosDurumCiz('⚠️', 'API\'ye bağlanılamadı. Sunucunun çalıştığından emin olun.');
+    } finally {
+      buton.disabled = false;
+      ikon.className = '';
+    }
+  }
+
+  // ── İSTATİSTİK KARTLARI (KPI) ──────────────────────────────────────────────
+  function kpiKartlariniGuncelle(adaylar) {
+    const bugun   = new Date();
+    const buAyCok = adaylar.filter(a => {
+      const d = new Date(a.olusturulma_tarihi);
+      return d.getMonth() === bugun.getMonth() && d.getFullYear() === bugun.getFullYear();
+    }).length;
+    const bugunCok = adaylar.filter(a =>
+      new Date(a.olusturulma_tarihi).toDateString() === bugun.toDateString()
+    ).length;
+
+    document.getElementById('kpiToplam').textContent  = adaylar.length;
+    document.getElementById('kpiBuAy').textContent  = buAyCok;
+    document.getElementById('kpiBugun').textContent  = bugunCok;
+    document.getElementById('kpiHedef').textContent = adaylar.length > 0 ? '%' + Math.round((bugunCok/adaylar.length)*100) : '%0';
+    document.getElementById('tabloSayaci').textContent = `${adaylar.length} kayıt`;
+  }
+
+  // ── TABLOYU EKRANA ÇİZME (RENDER) ──────────────────────────────────────────
+  function tabloyuCiz(adaylar) {
+    const tabloGovdesi = document.getElementById('adaylarTabloGovdesi');
+
+    if (adaylar.length === 0) {
+      bosDurumCiz('📭', 'Henüz kayıtlı lead bulunmuyor.');
+      return;
+    }
+
+    tabloGovdesi.innerHTML = adaylar.map((aday, i) => {
+      const yeniMi = (Date.now() - new Date(aday.olusturulma_tarihi).getTime()) < 86400000;
+      return `
+      <tr style="animation-delay:${i * 40}ms">
+        <td class="td-id">#${aday.id}</td>
+        <td>
+          <div class="td-name-cell">
+            <div class="td-avatar">${basHarfler(aday.isim)}</div>
+            <div>
+              <div class="td-name">${htmlTemizle(aday.isim)}</div>
+              <div class="td-phone">${htmlTemizle(aday.telefon)}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="td-message ${aday.mesaj ? '' : 'empty'}">
+            ${aday.mesaj ? htmlTemizle(aday.mesaj) : 'Mesaj bırakılmadı'}
+          </div>
+        </td>
+        <td class="td-date">${tarihFormatla(aday.olusturulma_tarihi)}</td>
+        <td>${yeniMi ? '<span class="badge-new">Yeni</span>' : '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── ARAMA FİLTRESİ ────────────────────────────────────────────────────────
+  document.getElementById('aramaKutusu').addEventListener('input', function() {
+    const sorgu = this.value.toLowerCase().trim();
+    if (!sorgu) { tabloyuCiz(sistemdekiAdaylar); return; }
+    
+    // İsme, telefona veya mesaja göre filtreleme
+    tabloyuCiz(sistemdekiAdaylar.filter(a =>
+      a.isim.toLowerCase().includes(sorgu) ||
+      a.telefon.toLowerCase().includes(sorgu) ||
+      (a.mesaj||'').toLowerCase().includes(sorgu)
+    ));
+  });
+
+  // ── EXCEL/CSV İNDİRME ─────────────────────────────────────────────────────
+  function csvIndir() {
+    if (!sistemdekiAdaylar.length) { alert('İndirilecek veri yok.'); return; }
+    const baslik = 'ID,İsim,Telefon,Mesaj,Tarih';
+    const satirlar = sistemdekiAdaylar.map(a =>
+      `${a.id},"${a.isim}","${a.telefon}","${(a.mesaj||'').replace(/"/g,'""')}","${a.olusturulma_tarihi}"`
+    );
+    const blob = new Blob([baslik + '\n' + satirlar.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url; 
+    link.download = `musteri_adaylari_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click(); 
+    URL.revokeObjectURL(url);
+  }
+
+  // Sayfa yüklendiğinde ilk verileri çek
+  adaylariYukle();
+
+  // Yöneticinin F5 atmasına gerek kalmadan tabloyu her 30 saniyede bir güncelle
+  setInterval(adaylariYukle, 30000);
+</script>
+</body>
+</html>
