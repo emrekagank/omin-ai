@@ -6,21 +6,6 @@ from app.database import musteri_adayi_ekle, tum_adaylari_getir
 api_arayuzu = Blueprint("api", __name__)
 sayfa_arayuzu = Blueprint("sayfalar", __name__)
 
-
-# ─── SAYFALAR (Arayüzler) ─────────────────────────────
-
-@sayfa_arayuzu.route("/")
-def karsilama_sayfasi():
-    """Son kullanıcıya (müşteriye) gösterilen, AI ile sohbet edilen ana web sayfasını sunar."""
-    # BURASI GÜNCELLENDİ: karsilama.html yerine index.html
-    return render_template("index.html")
-
-@sayfa_arayuzu.route("/panel")
-def yonetim_paneli():
-    """Firma yetkililerine gösterilen, müşteri kayıtlarının listelendiği Dashboard sayfasını sunar."""
-    return render_template("dashboard.html")
-
-
 # ─── API UÇ NOKTALARI (Endpoints) ──────────────────────
 
 @api_arayuzu.route("/sohbet", methods=["POST"])
