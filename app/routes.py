@@ -38,8 +38,8 @@ def aday_kaydet():
     mail = veri.get("telefon")
     mesaj = veri.get("mesaj")
 
-    if not isim or not mail:
-        return jsonify({"basari": False, "hata": "İsim ve mail bilgisi zorunludur."}), 400
+    #if not isim or not mail:
+    #    return jsonify({"basari": False, "hata": "İsim ve mail bilgisi zorunludur."}), 400
 
     musteri_adayi_ekle(isim, mail, mesaj)
     return jsonify({"basari": True, "mesaj": "Bilgileriniz başarıyla sistemimize kaydedildi."})
