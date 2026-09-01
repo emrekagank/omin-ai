@@ -28,7 +28,7 @@ def musteri_adayi_ekle(isim: str, mail: str, mesaj: str):
     baglanti = baglanti_al()
     imlec = baglanti.cursor()
     imlec.execute(
-        "INSERT INTO musteri_adaylari (isim, telefon, mesaj) VALUES (?, ?, ?)",
+        "INSERT INTO musteri_adaylari (isim, mail, mesaj) VALUES (?, ?, ?)",
         (isim, mail, mesaj)
     )
     baglanti.commit()
