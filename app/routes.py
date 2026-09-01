@@ -8,7 +8,6 @@ api_arayuzu = Blueprint("api", __name__)
 sayfa_arayuzu = Blueprint("sayfalar", __name__)
 
 # ─── API UÇ NOKTALARI (Endpoints) ──────────────────────
-@cross_origin()  
 @api_arayuzu.route("/sohbet", methods=["POST"])
 def sohbet_et():
     """
@@ -29,6 +28,7 @@ def sohbet_et():
         return jsonify({"basari": False, "hata": str(e)}), 503
 
 @api_arayuzu.route("/adaylar", methods=["POST"])
+@cross_origin()  
 def aday_kaydet():
     """
     Ziyaretçinin iletişim formundan gönderdiği isim ve telefon bilgilerini
@@ -46,6 +46,7 @@ def aday_kaydet():
     return jsonify({"basari": True, "mesaj": "Bilgileriniz başarıyla sistemimize kaydedildi."})
 
 @api_arayuzu.route("/adaylar", methods=["GET"])
+@cross_origin()  
 def adaylari_listele():
     """
     Yönetim panelindeki tabloyu doldurmak için veritabanındaki 
