@@ -15,8 +15,8 @@ def initialize_database(uygulama):
         imlec.execute('''
             CREATE TABLE IF NOT EXISTS musteri_adaylari (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                isim TEXT NOT NULL,
-                mail TEXT NOT NULL,
+                isim TEXT,
+                mail TEXT,
                 mesaj TEXT,
                 olusturulma_tarihi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
