@@ -35,13 +35,13 @@ def aday_kaydet():
     """
     veri = request.json
     isim = veri.get("isim")
-    telefon = veri.get("telefon")
-    mesaj = veri.get("mesaj", "")
+    mail = veri.get("telefon")
+    mesaj = veri.get("mesaj")
 
-    if not isim or not telefon:
-        return jsonify({"basari": False, "hata": "İsim ve telefon bilgisi zorunludur."}), 400
+    if not isim or not mail:
+        return jsonify({"basari": False, "hata": "İsim ve mail bilgisi zorunludur."}), 400
 
-    musteri_adayi_ekle(isim, telefon, mesaj)
+    musteri_adayi_ekle(isim, mail, mesaj)
     return jsonify({"basari": True, "mesaj": "Bilgileriniz başarıyla sistemimize kaydedildi."})
 
 @api_arayuzu.route("/adaylar", methods=["GET"])
