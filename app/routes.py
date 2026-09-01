@@ -1,13 +1,14 @@
 from flask import Blueprint, request, jsonify, render_template
 from app.services.ai_service import yapay_zeka_servisi, YapayZekaServisHatasi
 from app.database import musteri_adayi_ekle, tum_adaylari_getir
+from flask_cors import cross_origin
 
 # Rotaları gruplandırmak için Blueprint (Taslak) nesneleri oluşturuyoruz.
 api_arayuzu = Blueprint("api", __name__)
 sayfa_arayuzu = Blueprint("sayfalar", __name__)
 
 # ─── API UÇ NOKTALARI (Endpoints) ──────────────────────
-
+@cross_origin()  
 @api_arayuzu.route("/sohbet", methods=["POST"])
 def sohbet_et():
     """
