@@ -14,7 +14,7 @@ def initialize_database(uygulama):
         imlec = baglanti.cursor()
         imlec.execute('''
             CREATE TABLE IF NOT EXISTS musteri_adaylari (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id CHAR PRIMARY KEY AUTOINCREMENT,
                 isim TEXT,
                 mail TEXT,
                 mesaj TEXT,
