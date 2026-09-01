@@ -24,7 +24,7 @@ def initialize_database(uygulama):
         baglanti.commit()
         baglanti.close()
 
-def musteri_adayi_ekle(isim: str, telefon: str, mesaj: str):
+def musteri_adayi_ekle(isim: str, mail: str, mesaj: str):
     baglanti = baglanti_al()
     imlec = baglanti.cursor()
     imlec.execute(
