@@ -5,10 +5,10 @@ from flask_cors import cross_origin
 
 # Rotaları gruplandırmak için Blueprint (Taslak) nesneleri oluşturuyoruz.
 api_arayuzu = Blueprint("api", __name__)
-sayfa_arayuzu = Blueprint("sayfalar", __name__)
 
 # ─── API UÇ NOKTALARI (Endpoints) ──────────────────────
 @api_arayuzu.route("/sohbet", methods=["POST"])
+@cross_origin()  
 def sohbet_et():
     """
     Ön yüzden gelen sohbet mesajını alır, yapay zeka servisine iletir
@@ -36,7 +36,7 @@ def aday_kaydet():
     """
     veri = request.json
     isim = veri.get("isim")
-    mail = veri.get("telefon")
+    mail = veri.get("mail")
     mesaj = veri.get("mesaj")
 
     #if not isim or not mail:
