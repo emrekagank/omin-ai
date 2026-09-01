@@ -3,6 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 from config import config_selector
 from app.database import initialize_database
+from app.routes import api_arayuzu
 
 def initialize_app(config_name: str = None) -> Flask:
     app = Flask(__name__, template_folder="templates")
@@ -27,9 +28,8 @@ def initialize_app(config_name: str = None) -> Flask:
         initialize_database(app)
 
     # appnın alt modüllerini (Rotaları) ana sisteme monte ediyoruz
-    from app.routes import api_arayuzu, sayfa_arayuzu
+    
     app.register_blueprint(api_arayuzu, url_prefix="/api")
-    app.register_blueprint(sayfa_arayuzu)
 
     @app.route("/health")
     def saglik_kontrolu():
