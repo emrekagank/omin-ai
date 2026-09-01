@@ -9,7 +9,7 @@ def initialize_app(config_name: str = None) -> Flask:
 
     # Ortam değişkenine göre doğru konfigürasyonu seçip appya yüklüyoruz
     if config_name is None:
-        config_name = os.environ.get("FLASK_ENV", "development")
+        config_name = os.environ.get("FLASK_ENV", "")
     selected_config = config_selector.get(config_name, config_selector["development"])
     app.config.from_object(selected_config)
 
@@ -19,6 +19,7 @@ def initialize_app(config_name: str = None) -> Flask:
         origins=app.config.get("CORS_ALLOWED_ORIGINS", "*"),
         methods=["GET", "POST", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization"],
+        credentials = True,
     )
 
     # app bağlamında veritabanı tablolarının varlığını kontrol edip yoksa oluşturuyoruz
