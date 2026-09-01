@@ -16,7 +16,7 @@ def initialize_database(uygulama):
             CREATE TABLE IF NOT EXISTS musteri_adaylari (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 isim TEXT NOT NULL,
-                telefon TEXT NOT NULL,
+                mail TEXT NOT NULL,
                 mesaj TEXT,
                 olusturulma_tarihi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -29,7 +29,7 @@ def musteri_adayi_ekle(isim: str, telefon: str, mesaj: str):
     imlec = baglanti.cursor()
     imlec.execute(
         "INSERT INTO musteri_adaylari (isim, telefon, mesaj) VALUES (?, ?, ?)",
-        (isim, telefon, mesaj)
+        (isim, mail, mesaj)
     )
     baglanti.commit()
     baglanti.close()
@@ -46,7 +46,7 @@ def tum_adaylari_getir() -> list:
         adaylar.append({
             "id": satir["id"],
             "isim": satir["isim"],
-            "telefon": satir["telefon"],
+            "mail": satir["mail"],
             "mesaj": satir["mesaj"],
             "olusturulma_tarihi": satir["olusturulma_tarihi"]
         })
