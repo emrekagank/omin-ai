@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template
-from app.services.ai_service import yapay_zeka_servisi, YapayZekaServisHatasi
+from app.services.ai_service import AIService, YapayZekaServisHatasi
 from app.database import musteri_adayi_ekle, tum_adaylari_getir
 from flask_cors import cross_origin
 
@@ -22,7 +22,7 @@ def sohbet_et():
         return jsonify({"basari": False, "hata": "Mesaj alanı boş bırakılamaz."}), 400
 
     try:
-        yanit = yapay_zeka_servisi.yanit_uret(mesaj, gecmis)
+        yanit = AIService.yanit_uret(mesaj, gecmis)
         return jsonify({"basari": True, "cevap": yanit})
     except YapayZekaServisHatasi as e:
         return jsonify({"basari": False, "hata": str(e)}), 503
