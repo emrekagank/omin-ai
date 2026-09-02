@@ -2,52 +2,52 @@ import logging
 import requests
 from flask import current_app
 
-logger = logging.getLogger(__name__)
+loglayici = logging.getLogger(__name__)
 
-class AIService:
-    def response(self, usr_msg: str, chat_hist: list = None) -> str:
-        return self._gemini_cagir(usr_msg, chat_hist or [])
+class YapayZekaServisi:
+    def yanit_uret(self, kullanici_mesaji: str, sohbet_gecmisi: list = None) -> str:
+        return self._gemini_cagir(kullanici_mesaji, sohbet_gecmisi or [])
 
-    def _system_prompt(self) -> str:
-
+    def _sistem_talimati_olustur(self) -> str:
+        # 'BUSINESS_CONTEXT' arıyoruz
         return current_app.config.get(
             "BUSINESS_CONTEXT",
             "Sen yardımcı bir iş asistanısın."
         )
 
-    def _gemini_cagir(self, usr_msg: str, chat_hist: list) -> str:
+    def _gemini_cagir(self, kullanici_mesaji: str, gecmis: list) -> str:
         api_anahtari = current_app.config.get("GEMINI_API_KEY", "")
 
         if not api_anahtari:
-            logger.warning("GEMINI_API_KEY ayarlanmamış! Demo modu devrede.")
-            return self._demo_yaniti_ver(usr_msg)
+            loglayici.warning("GEMINI_API_KEY ayarlanmamış! Demo modu devrede.")
+            return self._demo_yaniti_ver(kullanici_mesaji)
 
-        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent"
+        baglanti_adresi = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent"
         
         
-        headers = {
+        istek_basliklari = {
             "Content-Type": "application/json",
             "x-goog-api-key": api_anahtari,
         }
             
 
-        sys_prompt = self._system_prompt()
-        content = [{"role": m["role"], "parts": [{"text": m["content"]}]} for m in chat_hist]
-        content.append({"role": "user", "parts": [{"text": f"{sys_prompt}\n\nKullanıcı: {usr_msg}"}]})
+        sistem_talimati = self._sistem_talimati_olustur()
+        icerik_paketi = [{"role": m["role"], "parts": [{"text": m["content"]}]} for m in gecmis]
+        icerik_paketi.append({"role": "user", "parts": [{"text": f"{sistem_talimati}\n\nKullanıcı: {kullanici_mesaji}"}]})
 
-        user_prompt = {
-            "contents": content,
-            "generationConfig": { "temperature": 0.7, "maxOutputTokens": 512, "topP": 0.95 }
+        gonderilecek_veri = {
+            "contents": icerik_paketi,
+            "generationConfig": { "temperature": 0.7, "maxOutputTokens": 500, "topP": 0.95 }
         }
 
         try:
-            ai_answer = requests.post(url, json=user_prompt, timeout=15, headers=headers)
-            ai_answer.raise_for_status()
-            answer = ai_answer.json()
-            generated_text = answer["candidates"][0]["content"]["parts"][0]["text"]
-            return generated_text.strip()
+            sunucu_cevabi = requests.post(baglanti_adresi, json=gonderilecek_veri, timeout=15, headers=istek_basliklari)
+            sunucu_cevabi.raise_for_status()
+            gelen_veri = sunucu_cevabi.json()
+            uretilen_metin = gelen_veri["candidates"][0]["content"]["parts"][0]["text"]
+            return uretilen_metin.strip()
         except Exception as hata:
-            logger.error(f"Gemini Hatası: {hata}")
+            loglayici.error(f"Gemini Hatası: {hata}")
             raise YapayZekaServisHatasi("Yapay zekâ servisine ulaşılamadı.")
 
     def _demo_yaniti_ver(self, kullanici_mesaji: str) -> str:
@@ -56,5 +56,5 @@ class AIService:
 class YapayZekaServisHatasi(Exception):
     pass
 
-yapay_zeka_servisi = AIService()
+yapay_zeka_servisi = YapayZekaServisi()
 
