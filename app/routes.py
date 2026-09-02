@@ -22,7 +22,7 @@ def sohbet_et():
         return jsonify({"basari": False, "hata": "Mesaj alanı boş bırakılamaz."}), 400
 
     try:
-        yanit = AIService.yanit_uret(mesaj, gecmis)
+        yanit = AIService.response(mesaj, gecmis)
         return jsonify({"basari": True, "cevap": yanit})
     except YapayZekaServisHatasi as e:
         return jsonify({"basari": False, "hata": str(e)}), 503
