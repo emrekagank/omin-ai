@@ -26,7 +26,7 @@ def initialize_app(config_name: str = None) -> Flask:
         initialize_database(app)
 
     
-    app.register_blueprint(api_arayuzu, url_prefix="/api")
+    app.register_blueprint(api_interface, url_prefix="/api")
 
     @app.route("/health")
     def saglik_kontrolu():
