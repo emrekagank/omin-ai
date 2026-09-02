@@ -3,12 +3,11 @@ from flask import Flask
 from flask_cors import CORS
 from config import config_selector
 from app.database import initialize_database
-from app.routes import api_arayuzu
+from app.routes import api_interface
 
 def initialize_app(config_name: str = None) -> Flask:
     app = Flask(__name__, template_folder="templates")
 
-    # Ortam değişkenine göre doğru konfigürasyonu seçip appya yüklüyoruz
     if config_name is None:
         config_name = os.environ.get("FLASK_ENV", "")
     selected_config = config_selector.get(config_name, config_selector["development"])
@@ -23,11 +22,9 @@ def initialize_app(config_name: str = None) -> Flask:
         credentials = True,
     )
 
-    # app bağlamında veritabanı tablolarının varlığını kontrol edip yoksa oluşturuyoruz
     with app.app_context():
         initialize_database(app)
 
-    # appnın alt modüllerini (Rotaları) ana sisteme monte ediyoruz
     
     app.register_blueprint(api_arayuzu, url_prefix="/api")
 

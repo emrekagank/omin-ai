@@ -10,7 +10,7 @@ class CONF:
     
     # API Anahtarları (.env dosyasında tam olarak böyle yazmalı)
     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-    AI_PROVIDER = os.environ.get("AI_PROVIDER", "groq")
+    AI_PROVIDER = os.environ.get("AI_PROVIDER", "")
     
     BUSINESS_CONTEXT = os.environ.get(
         "BUSINESS_CONTEXT",

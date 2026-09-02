@@ -2,7 +2,6 @@ import sqlite3
 from flask import current_app
 
 def baglanti_al():
-    # İNGİLİZCE STANDARTLARA GÖRE GÜNCELLENDİ (DATABASE_URL)
     vt_yolu = current_app.config.get("DATABASE_URL", "akilli_satis.db")
     baglanti = sqlite3.connect(vt_yolu)
     baglanti.row_factory = sqlite3.Row
