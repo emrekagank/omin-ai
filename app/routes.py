@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify, render_template
-from app.services.ai_service import AIService, YapayZekaServisHatasi
+from app.services.ai_service import yapay_zeka_servisi, YapayZekaServisHatasi
 from app.database import musteri_adayi_ekle, tum_adaylari_getir
 from flask_cors import cross_origin
 
 # Rotaları gruplandırmak için Blueprint (Taslak) nesneleri oluşturuyoruz.
-api_interface = Blueprint("api", __name__)
+api_arayuzu = Blueprint("api", __name__)
 
 # ─── API UÇ NOKTALARI (Endpoints) ──────────────────────
-@api_interface.route("/sohbet", methods=["POST"])
+@api_arayuzu.route("/sohbet", methods=["POST"])
 @cross_origin()  
 def sohbet_et():
     """
@@ -22,12 +22,12 @@ def sohbet_et():
         return jsonify({"basari": False, "hata": "Mesaj alanı boş bırakılamaz."}), 400
 
     try:
-        yanit = AIService.response(mesaj, gecmis)
+        yanit = yapay_zeka_servisi.yanit_uret(mesaj, gecmis)
         return jsonify({"basari": True, "cevap": yanit})
     except YapayZekaServisHatasi as e:
         return jsonify({"basari": False, "hata": str(e)}), 503
 
-@api_interface.route("/adaylar", methods=["POST"])
+@api_arayuzu.route("/adaylar", methods=["POST"])
 @cross_origin()  
 def aday_kaydet():
     """
@@ -45,7 +45,7 @@ def aday_kaydet():
     musteri_adayi_ekle(isim, mail, mesaj)
     return jsonify({"basari": True, "mesaj": "Bilgileriniz başarıyla sistemimize kaydedildi."})
 
-@api_interface.route("/adaylar", methods=["GET"])
+@api_arayuzu.route("/adaylar", methods=["GET"])
 @cross_origin()  
 def adaylari_listele():
     """
